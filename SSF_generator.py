@@ -286,6 +286,8 @@ if __name__ == '__main__':
             # 捕捉例外情況
             print(f"An error occurred: {e}")
 
+    save_image = input("要儲存圖片嗎？(y/n): ").strip().lower()
+
     detector = dlib.get_frontal_face_detector() # face detector
     predictor = dlib.shape_predictor("./shape_predictor_68_face_landmarks.dat") # feature extractor
     
@@ -293,4 +295,12 @@ if __name__ == '__main__':
     lefteye_mask, righteye_mask, mouth_mask = process_sources(lefteye, righteye, mouth)
     ssf_img = result(input_img, lefteye, lefteye_x, lefteye_y, righteye, righteye_x, righteye_y, mouth, mou_x, mou_y, lefteye_mask, righteye_mask, mouth_mask)
     
+    if save_image == 'y':
+        # 指定儲存圖片的路徑
+        save_path = f'result/{img_name}.jpg'  # 替換為儲存圖片的實際路徑
+        cv2.imwrite(save_path, ssf_img)
+        print(f"圖片已儲存至 {save_path}")
+    else:
+        print("圖片未儲存")
+
     show_img(ssf_img)
