@@ -301,6 +301,6 @@ if __name__ == '__main__':
         cv2.imwrite(save_path, ssf_img)
         print(f"圖片已儲存至 {save_path}")
     else:
-        print("圖片未儲存")
+        print("不儲存圖片")
 
     show_img(ssf_img)
