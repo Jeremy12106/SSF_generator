@@ -11,9 +11,10 @@ from imutils import face_utils  # Tools for handling facial data
 def show_img(img, bigger=False):
     if bigger:
         plt.figure(figsize=(15,15))
-    image_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB) #將色彩空間轉為RGB
-    plt.imshow(image_rgb) #在圖表中繪製圖片
-    plt.show()  #顯示圖表
+    image_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB) # 將色彩空間轉為RGB
+    plt.imshow(image_rgb)
+    plt.axis('off') # 不顯示坐標軸
+    plt.show()
 
 def rotate_img(img, angle):
     (h, w, d) = img.shape # 讀取圖片大小
@@ -39,15 +40,14 @@ def resize_img(img, size, Rlength):
     return resize_img
 
 def process_coordinate(img_path):
-    #輸入圖片
-    img = cv2.imread(img_path) #主圖像
+    img = cv2.imread(img_path)
     input_img = img.copy()
-    righteye=cv2.imread('./source/righteye.png') #右眼
-    lefteye=cv2.imread('./source/lefteye.png') #左眼
-    mouth=cv2.imread('./source/mouth.png') #嘴吧
-    dets = detector(img, 1) #使用detector進行人臉識別,dets為返回的結果
+    righteye=cv2.imread('./source/righteye.png') # 右眼
+    lefteye=cv2.imread('./source/lefteye.png') # 左眼
+    mouth=cv2.imread('./source/mouth.png') # 嘴巴
+    dets = detector(img, 1) # 使用detector進行人臉識別,dets為返回的結果
 
-    #尋找臉部68點
+    # 尋找臉部68點
     for k,d in enumerate(dets):
         # print("Detection: {} Left: {} Top: {} Right: {} Bottom: {}".format(
         #         k, d.left(), d.top(), d.right(), d.bottom()))
@@ -257,13 +257,13 @@ def result(input_img, lefteye, lefteye_x, lefteye_y, righteye, righteye_x, right
 if __name__ == '__main__':
     
     img_name = input('輸入想星爆的人像圖片名稱: ')
-    img_folder = './input_img/'  # 指定圖片所在的資料夾
+    img_folder = './input_img/'  # 指定輸入圖片所在的資料夾
 
     # 檢查 jpg 和 png 檔案
     img_extensions = ['.jpg', '.png']
     img_path = None
 
-    # 防護機制：檢查圖片是否存在
+    # 檢查圖片是否存在
     for ext in img_extensions:
         potential_path = f'{img_folder}{img_name}{ext}'
         if os.path.exists(potential_path):
@@ -274,16 +274,13 @@ if __name__ == '__main__':
         print(f"錯誤：在 {img_folder} 中找不到 {img_name} 的 .jpg 或 .png 檔案。")
     else:
         try:
-            # 嘗試讀取圖片檔案
             img = cv2.imread(img_path)
             if img is None:
                 raise ValueError("該檔案無法作為圖片載入。")
             
-            # 在此處進行圖片的處理
             print(f"圖片 {img_path} 已成功載入。")
         
         except Exception as e:
-            # 捕捉例外情況
             print(f"An error occurred: {e}")
 
     save_image = input("要儲存圖片嗎？(y/n): ").strip().lower()
@@ -297,7 +294,7 @@ if __name__ == '__main__':
     
     if save_image == 'y':
         # 指定儲存圖片的路徑
-        save_path = f'result/{img_name}.jpg'  # 替換為儲存圖片的實際路徑
+        save_path = f'result/{img_name}.jpg'
         cv2.imwrite(save_path, ssf_img)
         print(f"圖片已儲存至 {save_path}")
     else:
