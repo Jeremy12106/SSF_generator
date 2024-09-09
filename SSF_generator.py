@@ -63,22 +63,30 @@ def process_coordinate(img_path):
         # 繪製特徵點
         for index,pt in enumerate(shape.parts()):
             # print('Part {}: {}'.format(index, pt))
-            if index == 37:
-                lilx, lily = pt.x, pt.y
-            elif index == 40:
-                lirx, liry = pt.x, pt.y
-            elif index == 43:
-                rilx, rily = pt.x, pt.y
-            elif index == 46:
-                rirx, riry = pt.x, pt.y
-            elif index == 49:
-                lmx, lmy = pt.x, pt.y
-            elif index == 55:
-                rmx, rmy = pt.x, pt.y
-            elif index == 63:
-                umx, umy = pt.x, pt.y
-            elif index == 67:
-                dmx, dmy = pt.x, pt.y
+            if index == 37:  # 找出右眼右眼角座標
+                ReRaX = pt.x
+                ReRaY = pt.y
+            elif index == 40:  # 找出右眼左眼角座標
+                ReLaX = pt.x
+                ReLaY = pt.y
+            elif index == 43:  # 找出左眼右眼角座標
+                LeRaX = pt.x
+                LeRaY = pt.y
+            elif index == 46:  # 找出左眼左眼角座標
+                LeLaX = pt.x
+                LeLaY = pt.y
+            elif index == 49:  # 找出左嘴角座標
+                mLaX = pt.x
+                mLaY = pt.y
+            elif index == 55:  # 找出右嘴角座標
+                mRaX = pt.x
+                mRaY = pt.y
+            elif index == 63:  # 找出上嘴唇下座標
+                mUaX = pt.x
+                mUaY = pt.y
+            elif index == 67:  # 找出下嘴唇上座標
+                mDaX = pt.x
+                mDaY = pt.y
 
             # pt_pos = (pt.x, pt.y)
             # cv2.circle(img, pt_pos, 1, (255, 0, 0), 2) # 標記特徵點
@@ -88,19 +96,34 @@ def process_coordinate(img_path):
     # print()
 
     # 右眼眼距
-    Rlength=( math.sqrt((abs(lilx-lirx)**2) + (abs(lily-liry)**2)) ) # 兩點距離公式
+    Rlength=( math.sqrt((abs(ReRaX-ReLaX)**2) + (abs(ReRaY-ReLaY)**2)) ) # 兩點距離公式
     # print("右眼眼距:",Rlength)
 
     # 左眼眼距
-    Llength=( math.sqrt((abs(rilx-rirx)**2) + (abs(rily-riry)**2)) )  # 兩點距離公式
+    Llength=( math.sqrt((abs(LeRaX-LeLaX)**2) + (abs(LeRaY-LeLaY)**2)) )  # 兩點距離公式
     # print("左眼眼距:",Llength)
 
     # 嘴距
-    Mlength=( math.sqrt((abs(lmx-rmx)**2) + (abs(lmy-rmy)**2)) )  # 兩點距離公式
+    Mlength=( math.sqrt((abs(mLaX-mRaX)**2) + (abs(mLaY-mRaY)**2)) )  # 兩點距離公式
     # print("嘴距:",Mlength)
 
+    #--------------------------test--------------------------------
+    # # 計算右眼和左眼的斜率
+    # right_eye_slope = (ReRaY - ReLaY) / (ReRaX - ReLaX)
+    # left_eye_slope = (LeRaY - LeLaY) / (LeRaX - LeLaX)
 
+    # # 計算旋轉角度
+    # right_eye_angle = math.degrees(math.atan(right_eye_slope))
+    # left_eye_angle = math.degrees(math.atan(left_eye_slope))
 
+    # # 使用左右眼的平均角度來旋轉
+    # rotation_angle = (right_eye_angle + left_eye_angle) / 2
+
+    # # 旋轉右眼、左眼和嘴巴圖片
+    # righteye = rotate_img(righteye, rotation_angle)
+    # lefteye = rotate_img(lefteye, rotation_angle)
+    # mouth = rotate_img(mouth, rotation_angle)
+    #--------------------------------------------------------------
 
     # 處理右眼
     # print(righteye.shape) # 印出圖片大小
@@ -119,7 +142,7 @@ def process_coordinate(img_path):
     # print(lefteye.shape)  #印出圖片大小
     # show_img(lefteye)  #show出圖片
 
-    lefteye=resize_img(lefteye,16,Llength)  #圖片縮放
+    lefteye=resize_img(lefteye,16,Rlength)  #圖片縮放
     # print(lefteye.shape)  #印出圖片大小
     # show_img(lefteye)  #show出圖片
 
@@ -128,26 +151,26 @@ def process_coordinate(img_path):
     # print(mouth.shape)  #印出圖片大小
     # show_img(mouth)  #show出圖片
 
-    mouth=resize_img(mouth,5.75,Mlength)  #圖片縮放
+    mouth=resize_img(mouth,5.75,Rlength)  #圖片縮放
     # print(mouth.shape)  #印出圖片大小
     # show_img(mouth)  #show出圖片
 
 
 
     # 右眼中心座標
-    righteye_x=(lilx+lirx)/2-(righteye.shape[1]*0.54)  # 右眼中心x座標-星爆右眼中心x座標
-    righteye_y=(lily+liry)/2-(righteye.shape[0]*0.69)  # 右眼中心y座標-星爆右眼中心y座標
+    righteye_x=(ReRaX+ReLaX)/2-(righteye.shape[1]*0.54)  # 右眼中心x座標-星爆右眼中心x座標
+    righteye_y=(ReRaY+ReLaY)/2-(righteye.shape[0]*0.69)  # 右眼中心y座標-星爆右眼中心y座標
     # print("右眼中心座標",righteye_x,righteye_y)
 
     # 左眼中心座標
-    lefteye_x=(rilx+rirx)/2-(lefteye.shape[1]*0.55)  # 左眼中心x座標-星爆左眼中心x座標
-    lefteye_y=(rily+riry)/2-(lefteye.shape[0]*0.7)  # 左眼中心y座標-星爆左眼中心y座標
+    lefteye_x=(LeRaX+LeLaX)/2-(lefteye.shape[1]*0.55)  # 左眼中心x座標-星爆左眼中心x座標
+    lefteye_y=(LeRaY+LeLaY)/2-(lefteye.shape[0]*0.7)  # 左眼中心y座標-星爆左眼中心y座標
     # print("左眼中心座標",lefteye_x,lefteye_y)
 
     # 嘴巴中心座標
-    mou_x=(((lmx+rmx)/2-(mouth.shape[1]*0.42))+((umx+dmx)/2-(mouth.shape[1]*0.42)))/2  
+    mou_x=(((mLaX+mRaX)/2-(mouth.shape[1]*0.42))+((mUaX+mDaX)/2-(mouth.shape[1]*0.42)))/2  
     # ((嘴巴左右中心x座標-星爆嘴中心x座標)+(嘴巴上下中心x座標-星爆嘴中心x座標))/2
-    mou_y=(((lmy+lmy)/2-(mouth.shape[0]*0.5))+((umy+dmy)/2-(mouth.shape[0]*0.5)))/2   
+    mou_y=(((mLaY+mLaY)/2-(mouth.shape[0]*0.5))+((mUaY+mDaY)/2-(mouth.shape[0]*0.5)))/2   
     # ((嘴巴左右中心y座標-星爆嘴中心y座標)+(嘴巴上下中心y座標-星爆嘴中心y座標))/2
     # print("嘴巴中心座標",mou_x,mou_y)
 
