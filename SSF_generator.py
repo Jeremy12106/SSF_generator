@@ -28,9 +28,9 @@ def rotate_img(img, angle):
     
     return rotate_img
 
-def resize_img(img, size, Rlength):
+def resize_img(img, size, eyelength):
 
-    scale_percent =  Rlength/size # 要放大縮小幾%
+    scale_percent =  eyelength/size # 要放大縮小幾%
     width = int(img.shape[1] * scale_percent) # 縮放後圖片寬度
     height = int(img.shape[0] * scale_percent) # 縮放後圖片高度
     dim = (width, height) # 圖片形狀 
@@ -40,6 +40,7 @@ def resize_img(img, size, Rlength):
     return resize_img
 
 def process_coordinate(img_path):
+    predictor = dlib.shape_predictor("./shape_predictor_68_face_landmarks.dat") # feature extractor
     img = cv2.imread(img_path)
     input_img = img.copy()
     righteye=cv2.imread('./source/righteye.png') # 右眼
@@ -62,35 +63,28 @@ def process_coordinate(img_path):
         # 繪製特徵點
         for index,pt in enumerate(shape.parts()):
             # print('Part {}: {}'.format(index, pt))
-            if index == 37:  # 找出右眼右眼角座標
-                lilx = pt.x
-                lily = pt.y
-            elif index == 40:  # 找出右眼左眼角座標
-                lirx = pt.x
-                liry = pt.y
-            elif index == 43:  # 找出左眼右眼角座標
-                rilx = pt.x
-                rily = pt.y
-            elif index == 46:  # 找出左眼左眼角座標
-                rirx = pt.x
-                riry = pt.y
-            elif index == 49:  # 找出左嘴角座標
-                lmx = pt.x
-                lmy = pt.y
-            elif index == 55:  # 找出右嘴角座標
-                rmx = pt.x
-                rmy = pt.y
-            elif index == 63:  # 找出上嘴唇下座標
-                umx = pt.x
-                umy = pt.y
-            elif index == 67:  # 找出下嘴唇上座標
-                dmx = pt.x
-                dmy = pt.y
-            pt_pos = (pt.x, pt.y)
-            cv2.circle(img, pt_pos, 1, (255, 0, 0), 2) # 標記特徵點
+            if index == 37:
+                lilx, lily = pt.x, pt.y
+            elif index == 40:
+                lirx, liry = pt.x, pt.y
+            elif index == 43:
+                rilx, rily = pt.x, pt.y
+            elif index == 46:
+                rirx, riry = pt.x, pt.y
+            elif index == 49:
+                lmx, lmy = pt.x, pt.y
+            elif index == 55:
+                rmx, rmy = pt.x, pt.y
+            elif index == 63:
+                umx, umy = pt.x, pt.y
+            elif index == 67:
+                dmx, dmy = pt.x, pt.y
 
-            font = cv2.FONT_HERSHEY_SIMPLEX # 字體
-            cv2.putText(img, str(index+1), pt_pos, font, 0.3, (0, 0, 255), 1, cv2.LINE_AA) # 標記特徵點序號
+            # pt_pos = (pt.x, pt.y)
+            # cv2.circle(img, pt_pos, 1, (255, 0, 0), 2) # 標記特徵點
+
+            # font = cv2.FONT_HERSHEY_SIMPLEX # 字體
+            # cv2.putText(img, str(index+1), pt_pos, font, 0.3, (0, 0, 255), 1, cv2.LINE_AA) # 標記特徵點序號
     # print()
 
     # 右眼眼距
@@ -125,7 +119,7 @@ def process_coordinate(img_path):
     # print(lefteye.shape)  #印出圖片大小
     # show_img(lefteye)  #show出圖片
 
-    lefteye=resize_img(lefteye,16,Rlength)  #圖片縮放
+    lefteye=resize_img(lefteye,16,Llength)  #圖片縮放
     # print(lefteye.shape)  #印出圖片大小
     # show_img(lefteye)  #show出圖片
 
@@ -134,7 +128,7 @@ def process_coordinate(img_path):
     # print(mouth.shape)  #印出圖片大小
     # show_img(mouth)  #show出圖片
 
-    mouth=resize_img(mouth,5.75,Rlength)  #圖片縮放
+    mouth=resize_img(mouth,5.75,Mlength)  #圖片縮放
     # print(mouth.shape)  #印出圖片大小
     # show_img(mouth)  #show出圖片
 
@@ -185,9 +179,6 @@ def process_sources(lefteye, righteye, mouth):
     # 去背左眼
     lefteye_hsv = cv2.cvtColor(lefteye,cv2.COLOR_RGB2HSV)  #將色彩空間轉為RGB
 
-    lower_blue=np.array([0,0,0])  #獲取最小閾值
-    upper_blue=np.array([0,255,255])  #獲取最大閾值
-
     #cv2.inRange(圖片，低於這個的值圖像值變為0，高於這個的值圖像值變為0)
     mask = cv2.inRange(lefteye_hsv, lower_blue, upper_blue)  #創建遮罩
     # show_img(mask)
@@ -198,9 +189,6 @@ def process_sources(lefteye, righteye, mouth):
 
     #去背嘴巴
     mouth_hsv = cv2.cvtColor(mouth,cv2.COLOR_RGB2HSV)
-
-    lower_blue=np.array([0,0,0])  #獲取最小閾值
-    upper_blue=np.array([0,255,255])  #獲取最大閾值
 
     #cv2.inRange(圖片，低於這個的值圖像值變為0，高於這個的值圖像值變為0)
     mask = cv2.inRange(mouth_hsv, lower_blue, upper_blue)  #創建遮罩
@@ -286,7 +274,6 @@ if __name__ == '__main__':
     save_image = input("要儲存圖片嗎？(y/n): ").strip().lower()
 
     detector = dlib.get_frontal_face_detector() # face detector
-    predictor = dlib.shape_predictor("./shape_predictor_68_face_landmarks.dat") # feature extractor
     
     input_img, lefteye, lefteye_x, lefteye_y, righteye, righteye_x, righteye_y, mouth, mou_x, mou_y = process_coordinate(img_path)
     lefteye_mask, righteye_mask, mouth_mask = process_sources(lefteye, righteye, mouth)
