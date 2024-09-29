@@ -1,0 +1,5 @@
+input_img/*
+result/*
+
+!input_img/senpai.jpg
+!result/senpai.jpg
