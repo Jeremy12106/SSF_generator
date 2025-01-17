@@ -18,7 +18,7 @@
 
 #### 範例成果圖片
 
-<!-- ![範例成果圖片](result/senpai.jpg) -->
+![範例成果圖片](result/senpai.jpg)
 
 
 ## Gradio Web App
